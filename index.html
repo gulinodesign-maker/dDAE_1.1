@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+
+<html lang="it">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1, viewport-fit=cover" name="viewport"/>
+<title>Daedalium PMS</title>
+<meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control"/>
+<meta content="no-cache" http-equiv="Pragma"/>
+<meta content="0" http-equiv="Expires"/>
+<link href="./styles.css?v=1.214" rel="stylesheet"/>
+<link href="./manifest.json?v=1.214" rel="manifest"/>
+<link href="./assets/icons/apple-touch-icon.png?v=1.214" rel="apple-touch-icon" sizes="180x180"/>
+<link href="./assets/icons/apple-touch-icon.png?v=1.214" rel="apple-touch-icon-precomposed" sizes="180x180"/>
+<link href="./assets/icons/favicon-32.png?v=1.214" rel="icon" sizes="32x32" type="image/png"/>
+<link href="./assets/icons/favicon-16.png?v=1.214" rel="icon" sizes="16x16" type="image/png"/>
+<meta content="#ffffff" name="theme-color"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="Daedalium PMS" name="apple-mobile-web-app-title"/>
+<meta content="default" name="apple-mobile-web-app-status-bar-style"/>
+</head>
+<body>
+<header class="topbar">
+<div class="brand">
+<div class="brand-left">
+<img alt="Daedalium logo" class="logo" src="./assets/logo.jpg?v=1.214"/>
+<h1>Daedalium PMS</h1>
+</div>
+<div class="brand-right">
+<div class="top-pill" id="periodChip" title="Periodo attivo"></div>
+<button aria-label="Home" class="icon-btn" id="hamburgerBtn">
+<span aria-hidden="true" class="hamburger"></span>
+</button>
+</div>
+</div>
+</header>
+<main class="wrap">
+<!-- HOME (launcher) -->
+<section class="page" id="page-home">
+<div class="home-page">
+<div class="home-spacer"></div>
+<div aria-label="Sezioni" class="home-grid" role="navigation">
+<button aria-label="Ospiti" class="home-main" id="goOspite" type="button">
+<div aria-hidden="true" class="home-main-glyph alt"><svg aria-hidden="true" class="ui-ico" viewbox="0 0 24 24">
+<path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z"></path>
+<path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path>
+</svg></div>
+<div class="home-main-label">Ospiti</div>
+</button>
+<button aria-label="Apri Spese" class="home-main" id="openLauncher" type="button">
+<div aria-hidden="true" class="home-main-glyph"><svg aria-hidden="true" class="ui-ico" viewbox="0 0 24 24">
+<path d="M9 6.5h6"></path>
+<path d="M9 6.5V5.5A2.5 2.5 0 0 1 11.5 3h1A2.5 2.5 0 0 1 15 5.5v1"></path>
+<path d="M4.5 9.5h15a2 2 0 0 1 2 2v6.5a3 3 0 0 1-3 3h-13a3 3 0 0 1-3-3V11.5a2 2 0 0 1 2-2Z"></path>
+<path d="M4.5 13h15"></path>
+</svg></div>
+<div class="home-main-label">Spese</div>
+</button>
+<button aria-label="Calendario" class="home-main" id="goCalendario" data-go="calendario" type="button">
+<div aria-hidden="true" class="home-main-glyph alt"><svg aria-hidden="true" class="ui-ico" viewbox="0 0 24 24">
+<path d="M7 3v3"></path>
+<path d="M17 3v3"></path>
+<path d="M4.5 8h15"></path>
+<path d="M6 6h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"></path>
+<path d="M8 12h.01"></path>
+<path d="M12 12h.01"></path>
+<path d="M16 12h.01"></path>
+<path d="M8 16h.01"></path>
+<path d="M12 16h.01"></path>
+<path d="M16 16h.01"></path>
+</svg></div>
+<div class="home-main-label">Calendario</div>
+</button>
+<button aria-label="Tassa di soggiorno" class="home-main" id="goTassaSoggiorno" type="button">
+<div aria-hidden="true" class="home-main-glyph"><svg aria-hidden="true" class="ui-ico" viewbox="0 0 24 24">
+<path d="M7 10V8.5A4.5 4.5 0 0 1 11.5 4h1A4.5 4.5 0 0 1 17 8.5V10"></path>
+<path d="M5.5 10h13a2 2 0 0 1 2 2v6a3 3 0 0 1-3 3h-11a3 3 0 0 1-3-3v-6a2 2 0 0 1 2-2Z"></path>
+<path d="M12 13v5"></path>
+<path d="M10.2 14.8 12 13l1.8 1.8"></path>
+</svg></div>
+<div class="home-main-label small">Tassa di soggiorno</div>
+</button>
+<button aria-label="Pulizie" class="home-main" id="goPulizie" type="button">
+<div aria-hidden="true" class="home-main-glyph alt"><svg aria-hidden="true" class="ui-ico" viewbox="0 0 24 24">
+<path d="M9 3h6"></path>
+<path d="M10 3v3"></path>
+<path d="M14 3v3"></path>
+<path d="M8 6h8"></path>
+<path d="M9 6v3a3 3 0 0 0 6 0V6"></path>
+<path d="M7 12h10"></path>
+<path d="M8 12l-2 9h12l-2-9"></path>
+</svg></div>
+<div class="home-main-label">Pulizie</div>
+</button>
+<button aria-label="Guadagni" class="home-main" id="goGuadagni" type="button">
+<div aria-hidden="true" class="home-main-glyph"><svg aria-hidden="true" class="ui-ico" viewbox="0 0 24 24">
+<path d="M7 9V7.5A2.5 2.5 0 0 1 9.5 5h5A2.5 2.5 0 0 1 17 7.5V9"></path>
+<path d="M6 9h12a2 2 0 0 1 2 2v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-7a2 2 0 0 1 2-2Z"></path>
+<path d="M9 15h6"></path>
+<path d="M12 12v6"></path>
+</svg></div>
+<div class="home-main-label">Guadagni</div>
+</button>
+
+<button aria-label="Ore pulizia" class="home-main" id="goOrePulizia" type="button">
+  <div aria-hidden="true" class="home-main-glyph alt"><svg aria-hidden="true" class="ui-ico" viewBox="0 0 24 24">
+    <path d="M12 8v5l3 2"></path>
+    <path d="M12 22a10 10 0 1 0-10-10 10 10 0 0 0 10 10Z"></path>
+  </svg></div>
+  <div class="home-main-label">Ore pulizia</div>
+</button>
+
+<button aria-label="Impostazioni" class="home-main" id="goImpostazioni" type="button">
+  <div aria-hidden="true" class="home-main-glyph alt"><svg aria-hidden="true" class="ui-ico" viewBox="0 0 24 24">
+    <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
+    <path d="M19.4 15a7.97 7.97 0 0 0 .1-1 7.97 7.97 0 0 0-.1-1l2.1-1.6a.5.5 0 0 0 .1-.6l-2-3.5a.5.5 0 0 0-.6-.2l-2.5 1a8.28 8.28 0 0 0-1.7-1l-.4-2.6A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.4l-.4 2.6a8.28 8.28 0 0 0-1.7 1l-2.5-1a.5.5 0 0 0-.6.2l-2 3.5a.5.5 0 0 0 .1.6L4.6 13a7.97 7.97 0 0 0-.1 1 7.97 7.97 0 0 0 .1 1L2.5 16.6a.5.5 0 0 0-.1.6l2 3.5a.5.5 0 0 0 .6.2l2.5-1a8.28 8.28 0 0 0 1.7 1l.4 2.6a.5.5 0 0 0 .5.4h4a.5.5 0 0 0 .5-.4l.4-2.6a8.28 8.28 0 0 0 1.7-1l2.5 1a.5.5 0 0 0 .6-.2l2-3.5a.5.5 0 0 0-.1-.6Z"></path>
+  </svg></div>
+  <div class="home-main-label">Impostazioni</div>
+</button>
+
+<div class="build" id="buildText">1.214</div>
+<div class="home-spacer"></div>
+</div>
+</section>
+
+
+<section class="page" hidden="" id="page-impostazioni">
+  <div class="card">
+    <div class="hd">
+      <button class="btn ghost" id="settingsBackBtn" type="button" aria-label="Indietro">←</button>
+      <h2>Impostazioni</h2>
+    </div>
+    <div class="bd">
+      <div class="field float">
+        <input id="setOp1" autocomplete="off" placeholder=" " />
+        <label for="setOp1">Operatore 1 (nome)</label>
+      </div>
+      <div class="field float" style="margin-top:10px;">
+        <input id="setOp2" autocomplete="off" placeholder=" " />
+        <label for="setOp2">Operatore 2 (nome)</label>
+      </div>
+      <div class="field float" style="margin-top:10px;">
+        <input id="setOp3" autocomplete="off" placeholder=" " />
+        <label for="setOp3">Operatore 3 (nome)</label>
+      </div>
+
+      <div class="field float" style="margin-top:16px;">
+        <input id="setTariffa" inputmode="decimal" min="0" step="0.01" type="number" placeholder=" " />
+        <label for="setTariffa">Tariffa oraria operatore (€ / ora)</label>
+      </div>
+
+      <div class="field float" style="margin-top:10px;">
+        <input id="setBenzina" inputmode="decimal" min="0" step="0.01" type="number" placeholder=" " />
+        <label for="setBenzina">Costo benzina (€)</label>
+      </div>
+
+      <div class="field float" style="margin-top:10px;">
+        <input id="setTassa" inputmode="decimal" min="0" step="0.01" type="number" placeholder=" " />
+        <label for="setTassa">Tassa di soggiorno (€ / persona / notte)</label>
+      </div>
+
+      <div class="row" style="margin-top:16px; gap:10px;">
+        <button class="btn primary" id="settingsSaveBtn" type="button" style="flex:1;">Salva</button>
+        <button class="btn ghost" id="settingsReloadBtn" type="button">Ricarica</button>
+      </div>
+
+      <div class="muted small" id="settingsHint" style="margin-top:12px;">
+        I valori vengono salvati nel foglio Google <b>impostazioni</b>.
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" hidden="" id="page-tassa">
+  <div class="card">
+    <div class="hd tax-hd">
+      <button class="btn ghost tax-back" id="taxBackBtn" type="button" aria-label="Indietro">←</button>
+      <h2>Tassa di soggiorno</h2>
+    </div>
+    <div class="bd">
+      <div class="tax-period">
+        <div class="field float">
+          <input id="taxFrom" type="date" placeholder=" " />
+          <label for="taxFrom">Da</label>
+        </div>
+        <div class="field float">
+          <input id="taxTo" type="date" placeholder=" " />
+          <label for="taxTo">A</label>
+        </div>
+      </div>
+
+      <button class="btn tax-calc" id="taxCalcBtn" type="button">Calcola</button>
+
+      <div class="tax-results" id="taxResults" hidden>
+        <div class="tax-result-card tax-result-paying" id="taxPayingCard">
+          <div class="tax-result-top">
+            <div class="tax-result-title">Ospiti paganti</div>
+            <div class="tax-result-value" id="taxPayingCount">—</div>
+          </div>
+          <div class="tax-result-sub" id="taxPayingAmount">—</div>
+        </div>
+
+        <div class="tax-result-card tax-result-kids" id="taxKidsCard">
+          <div class="tax-result-top">
+            <div class="tax-result-title">Bambini (&lt;10)</div>
+            <div class="tax-result-value" id="taxKidsCount">—</div>
+          </div>
+          <div class="tax-result-sub" id="taxKidsAmount">—</div>
+        </div>
+
+        <div class="tax-result-card tax-result-reduced" id="taxReducedCard">
+          <div class="tax-result-top">
+            <div class="tax-result-title">Altri (ridotti)</div>
+            <div class="tax-result-value" id="taxReducedCount">—</div>
+          </div>
+          <div class="tax-result-sub" id="taxReducedAmount">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 1) INSERISCI -->
+<section class="page" hidden="" id="page-inserisci">
+<div class="card">
+<div class="hd"><h2>Inserisci spesa</h2></div>
+<div class="bd">
+<div class="field float">
+<input id="spesaImporto" inputmode="decimal" min="0" placeholder=" " step="0.01" type="number"/>
+<label for="spesaImporto">Importo (€)</label>
+</div>
+<div class="field float" style="margin-top:10px;">
+<input autocomplete="off" id="spesaMotivazione" list="motivazioniList" placeholder=" "/>
+<label for="spesaMotivazione">Motivazione</label>
+<datalist id="motivazioniList"></datalist>
+</div>
+<div class="field float" style="margin-top:10px;">
+<input id="spesaData" type="date"/>
+<label for="spesaData">Data</label>
+</div>
+<div class="field float" style="margin-top:10px;">
+<select id="spesaCategoria" required="">
+<option value="">Seleziona…</option>
+<option value="CONTANTI">Contanti</option>
+<option value="TASSA_SOGGIORNO">Tassa di soggiorno</option>
+<option value="IVA_22">IVA 22%</option>
+<option value="IVA_10">IVA 10%</option>
+<option value="IVA_4">IVA 4%</option>
+</select>
+<label for="spesaCategoria">Categoria</label>
+</div>
+<div class="row" style="margin-top:14px;">
+<button class="btn primary" id="btnSaveSpesa" style="flex:1;" type="button">Salva</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 2) SPESE -->
+<section class="page" hidden="" id="page-spese">
+<div class="card">
+<div class="hd">
+<h2>Spese</h2>
+<div class="hd-actions">
+<button aria-label="Grafico e riepilogo" class="sq-btn sq-btn-blue" id="btnSpeseInsights" type="button">
+<div aria-hidden="true" class="sq-ico"><svg aria-hidden="true" class="ui-ico" viewBox="0 0 24 24">
+<path d="M4 19V5"></path>
+<path d="M4 19h16"></path>
+<path d="M7 16v-4"></path>
+<path d="M11 16v-7"></path>
+<path d="M15 16v-3"></path>
+<path d="M19 16v-9"></path>
+</svg></div>
+</button>
+<button aria-label="Aggiungi spesa" class="sq-btn sq-btn-orange" id="btnAddSpesa" type="button">
+<div aria-hidden="true" class="sq-ico"><svg aria-hidden="true" class="ui-ico" viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></div>
+</button>
+</div>
+</div>
+<div class="bd">
+<div class="period-tabs-row">
+<div class="field period-preset">
+<select aria-label="Periodo" id="periodPreset1">
+<!-- options injected by JS -->
+</select>
+</div>
+
+<div class="field period-sort">
+  <select aria-label="Ordina spese" id="speseSort">
+    <option value="date">Ordina: data</option>
+    <option value="insert">Ordina: inserimento</option>
+    <option value="motivazione">Ordina: motivazione</option>
+  </select>
+</div>
+
+</div>
+<div id="speseViewList">
+<div class="list" id="speseList"></div>
+</div>
+<div id="speseViewInsights" hidden>
+<div class="kpi-stack kpi-top" style="margin-top:12px;">
+<div class="kpi-card">
+<div class="kpi-label">Totale spese</div>
+<div class="kpi-value" id="kpiTotSpese">€ 0,00</div>
+</div>
+<div class="kpi-card accent">
+<div class="kpi-label">IVA detraibile</div>
+<div class="kpi-value" id="kpiIvaDetraibile">€ 0,00</div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">Totale imponibile</div>
+<div class="kpi-value" id="kpiImponibile">€ 0,00</div>
+</div>
+</div>
+<div style="height:12px;"></div>
+<div class="chart-wrap">
+<canvas aria-label="Grafico a torta per categoria" id="pieCanvas" width="320" height="320"></canvas>
+</div>
+<div class="legend" id="pieLegend"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- 3) RIEPILOGO -->
+
+
+<!-- 4) GRAFICO -->
+
+
+<!-- Pagina Ospite (DB) -->
+<section aria-label="Nuovo ospite" class="page" hidden="" id="page-ospite">
+<div class="content">
+<div class="ospite-wrap">
+<div class="card guest-form-card">
+<div class="hd">
+  <h2 id="ospiteFormTitle">Nuovo ospite</h2>
+  <div class="guest-hd-actions" id="ospiteHdActions" hidden>
+    
+    <button class="tl-btn tl-indigo" type="button" data-guest-cal aria-label="Vai al calendario" title="Calendario">
+      <svg class="tl-ico" aria-hidden="true" viewBox="0 0 24 24"><path d="M8 2v3M16 2v3M3 9h18"/><path d="M5 5h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2"/></svg><span class="sr-only">Calendario</span>
+    </button>
+<button class="tl-btn tl-green" type="button" data-guest-back aria-label="Torna alla lista ospiti"><svg class="tl-ico" aria-hidden="true" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span class="sr-only">Indietro</span></button>
+    <button class="tl-btn tl-yellow" type="button" data-guest-edit aria-label="Modifica ospite"><svg class="tl-ico" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg><span class="sr-only">Modifica</span></button>
+    <button class="tl-btn tl-red" type="button" data-guest-del aria-label="Elimina ospite"><svg class="tl-ico" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 16h10l1-16"/><path d="M10 11v6M14 11v6"/></svg><span class="sr-only">Elimina</span></button>
+  </div>
+</div>
+<div class="bd form-stack">
+<div class="field float">
+<input autocomplete="name" id="guestName" placeholder=" " type="text"/>
+<label for="guestName">Nome ospite</label>
+</div>
+<div class="field two-col">
+<div class="subfield field float">
+<input id="guestAdults" inputmode="numeric" min="0" placeholder=" " step="1" type="number"/>
+<label for="guestAdults">Adulti</label>
+</div>
+<div class="subfield field float">
+<input id="guestKidsU10" inputmode="numeric" min="0" placeholder=" " step="1" type="number"/>
+<label for="guestKidsU10">Bambini &lt; 10</label>
+</div>
+</div>
+<div class="field two-col">
+<div class="subfield field float">
+<input id="guestCheckIn" type="date"/>
+<label for="guestCheckIn">Check-in</label>
+</div>
+<div class="subfield field float">
+<input id="guestCheckOut" type="date"/>
+<label for="guestCheckOut">Check-out</label>
+</div>
+</div>
+<div class="field">
+<label>Stanze</label>
+<div aria-label="Seleziona stanze" class="rooms" id="roomsPicker" role="group">
+<button aria-pressed="false" class="room-dot" data-room="1" type="button">1</button>
+<button aria-pressed="false" class="room-dot" data-room="2" type="button">2</button>
+<button aria-pressed="false" class="room-dot" data-room="3" type="button">3</button>
+<button aria-pressed="false" class="room-dot" data-room="4" type="button">4</button>
+<button aria-pressed="false" class="room-dot" data-room="5" type="button">5</button>
+<button aria-pressed="false" class="room-dot" data-room="6" type="button">6</button>
+<button aria-pressed="false" class="room-dot room-dot-marriage" id="roomMarriage" type="button" title="Matrimonio">M</button>
+</div>
+<div id="roomsReadOnly" class="rooms-readonly" hidden></div>
+</div>
+
+<div class="field float">
+<input id="guestTotal" inputmode="decimal" placeholder=" " step="0.01" type="number"/>
+<label for="guestTotal">Importo prenotazione (€)</label>
+</div>
+<div class="field float">
+<input id="guestBooking" inputmode="decimal" placeholder=" " step="0.01" type="number"/>
+<label for="guestBooking">Importo booking (€)</label>
+</div>
+<div class="field two-col payment-row">
+<div class="subfield field float">
+<input id="guestDeposit" inputmode="decimal" placeholder=" " step="0.01" type="number"/>
+<label for="guestDeposit">Acconto (€)</label>
+</div>
+<div class="subfield paywrap">
+    <div aria-label="Tipo acconto" class="pay-pill" id="depositType" role="group">
+  <button class="pay-dot pay-cash selected" data-type="contante" aria-pressed="true" type="button" title="Contanti"></button>
+  <button class="pay-dot pay-elec" data-type="elettronico" aria-pressed="false" type="button" title="Elettronico"></button>
+  <button class="pay-dot pay-receipt" data-receipt="1" aria-pressed="false" type="button" title="Ricevuta"></button>
+</div>
+</div>
+</div>
+<div class="field two-col payment-row">
+  <div class="subfield field float">
+    <input id="guestSaldo" inputmode="decimal" placeholder="0" type="number" min="0" step="0.01"/>
+    
+  
+    <label for="guestSaldo">Saldo (€)</label>
+</div>
+  <div class="subfield paywrap">
+    <div aria-label="Saldo" class="pay-pill" id="saldoType" role="group">
+      <button class="pay-dot pay-cash selected" data-type="contante" aria-pressed="true" type="button" title="Contanti"></button>
+      <button class="pay-dot pay-elec" data-type="elettronico" aria-pressed="false" type="button" title="Elettronico"></button>
+      <button class="pay-dot pay-receipt" data-receipt="1" aria-pressed="false" type="button" title="Ricevuta"></button>
+    </div>
+    
+  </div>
+</div>
+
+<div class="field two-col payment-row">
+  <div class="subfield field float">
+    <input id="guestRemaining" inputmode="decimal" placeholder=" " type="number" min="0" step="0.01" readonly/>
+    <label for="guestRemaining">Rimanenza da pagare (€)</label>
+  </div>
+  <div class="subfield paywrap">
+    <div aria-label="Registrazioni" class="pay-pill" id="regTags" role="group">
+      <button class="pay-dot pay-ps" data-flag="ps" aria-pressed="false" type="button" title="Polizia di Stato"></button>
+      <span class="pay-dot pay-gap" aria-hidden="true"></span>
+      <button class="pay-dot pay-istat" data-flag="istat" aria-pressed="false" type="button" title="ISTAT"></button>
+    </div>
+  </div>
+</div>
+
+
+<button class="btn primary" id="createGuestCard" type="button">Crea scheda cliente</button>
+</div>
+</div>
+</div>
+</div>
+</section><section aria-label="Ospiti" class="page" hidden="" id="page-ospiti"><div class="content"><div class="ospite-wrap"><div class="card guest-cards-card"><div class="hd"><h2>Ospiti</h2><button id="btnNewGuestOspiti" class="btn-add-guest" type="button" aria-label="Nuovo ospite">+</button></div><div class="bd">
+<div class="guest-filter-grid" aria-label="Filtri ospiti">
+  <div class="field gf-tile gf-sort" aria-label="Ordinamento">
+    <select id="guestSortBy" aria-label="Ordina ospiti per">
+      <option value="inserimento">Inserimento</option>
+      <option value="arrivo">Arrivo</option>
+      <option value="nome">Nome</option>
+    </select>
+    <button class="gf-dir" id="guestSortDir" type="button" aria-label="Direzione ordinamento" aria-pressed="false">↓</button>
+  </div>
+  <div class="field gf-tile" aria-label="Periodo rapido">
+    <select aria-label="Periodo" id="periodPreset4">
+      <!-- options injected by JS -->
+    </select>
+  </div>
+  <div class="field gf-tile" aria-label="Da">
+</div>
+  <div class="field gf-tile" aria-label="A">
+</div>
+</div>
+<div class="guest-cards" id="guestCards"></div></div></div></div></div></section>
+
+<!-- CALENDARIO -->
+<section aria-label="Calendario" class="page" hidden="" id="page-calendario">
+  <div class="content calendar-page">
+    <div class="cal-nav">
+      <div class="cal-nav-row" role="group" aria-label="Navigazione calendario">
+        <button class="cal-nav-btn" id="calPickBtn" type="button" aria-label="Seleziona data">
+          <svg class="ui-ico" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 3v3"></path>
+            <path d="M17 3v3"></path>
+            <path d="M4.5 8h15"></path>
+            <path d="M6 6h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"></path>
+          </svg>
+        </button>
+        <button class="cal-nav-btn" id="calTodayBtn" type="button" aria-label="Settimana corrente">
+          <svg class="ui-ico" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="8"></circle>
+            <circle cx="12" cy="12" r="2"></circle>
+          </svg>
+        </button>
+        <button class="cal-nav-btn" id="calPrevBtn" type="button" aria-label="Settimana precedente">
+          <svg class="ui-ico" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6"></path>
+          </svg>
+        </button>
+        <button class="cal-nav-btn" id="calNextBtn" type="button" aria-label="Settimana successiva">
+          <svg class="ui-ico" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 18l6-6-6-6"></path>
+          </svg>
+        </button>
+
+        <input id="calDateInput" type="date" class="cal-date-input" aria-label="Data" />
+      </div>
+    </div>
+
+    <div class="cal-body">
+      <div class="cal-week-title" id="calWeekTitle">GENNAIO</div>
+      <div class="cal-grid-wrap">
+      <div class="cal-grid" id="calGrid" aria-label="Calendario settimanale"></div>
+    </div>
+    </div>
+
+    <div class="cal-legend" aria-label="Legenda letti">
+      <div class="cal-legend-item"><span class="cal-legend-dot bed-dot bed-dot-m" aria-hidden="true"></span><span>Matrimoniale</span></div>
+      <div class="cal-legend-item"><span class="cal-legend-dot bed-dot bed-dot-s" aria-hidden="true"></span><span>Singolo</span></div>
+      <div class="cal-legend-item"><span class="cal-legend-dot bed-dot bed-dot-c" aria-hidden="true"></span><span>Culla</span></div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="page" id="page-pulizie" style="display:none;">
+  <div class="hd">
+    <div class="title"></div>
+  </div>
+
+  <div class="bd">
+    <div class="clean-topbar">
+  <div class="clean-top-left">
+    <button aria-label="Ore pulizia" class="sq-btn sq-btn-orange" id="btnOrePuliziaFromPulizie" type="button">
+          <div aria-hidden="true" class="sq-ico"><svg aria-hidden="true" class="ui-ico" viewBox="0 0 24 24">
+    <path d="M12 8v5l3 2"></path>
+    <path d="M12 22a10 10 0 1 0-10-10 10 10 0 0 0 10 10Z"></path>
+    </svg></div>
+        </button>
+  </div>
+  <div class="clean-nav">
+    <button class="btn ghost" id="cleanPrev" type="button">←</button>
+    <button class="btn" id="cleanToday" type="button">Oggi</button>
+    <button class="btn ghost" id="cleanNext" type="button">→</button>
+  </div>
+  <div class="clean-top-actions">
+    <button aria-label="Foglio lavanderia" class="sq-btn sq-btn-blue" id="btnLaundryFromPulizie" type="button">
+      <div aria-hidden="true" class="sq-ico"><svg aria-hidden="true" class="ui-ico" viewBox="0 0 24 24">
+<path d="M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"></path>
+<path d="M7 7h.01"></path>
+<path d="M10 7h.01"></path>
+<path d="M13 7h6"></path>
+<circle cx="12" cy="14" r="4"></circle>
+</svg></div>
+    </button>
+  </div>
+</div>
+    <div class="clean-mainGroup">
+
+    <div class="clean-date" id="cleanDateLabel">1 Gennaio 2026</div>
+
+    <!-- Griglia: riga header (MAT..TAP) + 6 righe stanze (1..6) = 7 righe totali.
+         La prima cella in alto a sinistra è vuota. -->
+        <div class="clean-grid-wrap">
+      <div class="clean-grid" id="cleanGrid">
+        <div class="c cell head corner"></div>
+        <div class="c cell head">MAT</div>
+        <div class="c cell head">SIN</div>
+        <div class="c cell head">FED</div>
+        <div class="c cell head">TDO</div>
+        <div class="c cell head">TFA</div>
+        <div class="c cell head">TBI</div>
+        <div class="c cell head">TAP</div>
+        <div class="c cell head">TPI</div>
+        <div class="c cell room r1">1</div>
+        <div class="c cell slot" data-room="1" data-col="MAT"></div>
+        <div class="c cell slot" data-room="1" data-col="SIN"></div>
+        <div class="c cell slot" data-room="1" data-col="FED"></div>
+        <div class="c cell slot" data-room="1" data-col="TDO"></div>
+        <div class="c cell slot" data-room="1" data-col="TFA"></div>
+        <div class="c cell slot" data-room="1" data-col="TBI"></div>
+        <div class="c cell slot" data-room="1" data-col="TAP"></div>
+        <div class="c cell slot" data-room="1" data-col="TPI"></div>
+        <div class="c cell room r2">2</div>
+        <div class="c cell slot" data-room="2" data-col="MAT"></div>
+        <div class="c cell slot" data-room="2" data-col="SIN"></div>
+        <div class="c cell slot" data-room="2" data-col="FED"></div>
+        <div class="c cell slot" data-room="2" data-col="TDO"></div>
+        <div class="c cell slot" data-room="2" data-col="TFA"></div>
+        <div class="c cell slot" data-room="2" data-col="TBI"></div>
+        <div class="c cell slot" data-room="2" data-col="TAP"></div>
+        <div class="c cell slot" data-room="2" data-col="TPI"></div>
+        <div class="c cell room r3">3</div>
+        <div class="c cell slot" data-room="3" data-col="MAT"></div>
+        <div class="c cell slot" data-room="3" data-col="SIN"></div>
+        <div class="c cell slot" data-room="3" data-col="FED"></div>
+        <div class="c cell slot" data-room="3" data-col="TDO"></div>
+        <div class="c cell slot" data-room="3" data-col="TFA"></div>
+        <div class="c cell slot" data-room="3" data-col="TBI"></div>
+        <div class="c cell slot" data-room="3" data-col="TAP"></div>
+        <div class="c cell slot" data-room="3" data-col="TPI"></div>
+        <div class="c cell room r4">4</div>
+        <div class="c cell slot" data-room="4" data-col="MAT"></div>
+        <div class="c cell slot" data-room="4" data-col="SIN"></div>
+        <div class="c cell slot" data-room="4" data-col="FED"></div>
+        <div class="c cell slot" data-room="4" data-col="TDO"></div>
+        <div class="c cell slot" data-room="4" data-col="TFA"></div>
+        <div class="c cell slot" data-room="4" data-col="TBI"></div>
+        <div class="c cell slot" data-room="4" data-col="TAP"></div>
+        <div class="c cell slot" data-room="4" data-col="TPI"></div>
+        <div class="c cell room r5">5</div>
+        <div class="c cell slot" data-room="5" data-col="MAT"></div>
+        <div class="c cell slot" data-room="5" data-col="SIN"></div>
+        <div class="c cell slot" data-room="5" data-col="FED"></div>
+        <div class="c cell slot" data-room="5" data-col="TDO"></div>
+        <div class="c cell slot" data-room="5" data-col="TFA"></div>
+        <div class="c cell slot" data-room="5" data-col="TBI"></div>
+        <div class="c cell slot" data-room="5" data-col="TAP"></div>
+        <div class="c cell slot" data-room="5" data-col="TPI"></div>
+        <div class="c cell room r6">6</div>
+        <div class="c cell slot" data-room="6" data-col="MAT"></div>
+        <div class="c cell slot" data-room="6" data-col="SIN"></div>
+        <div class="c cell slot" data-room="6" data-col="FED"></div>
+        <div class="c cell slot" data-room="6" data-col="TDO"></div>
+        <div class="c cell slot" data-room="6" data-col="TFA"></div>
+        <div class="c cell slot" data-room="6" data-col="TBI"></div>
+        <div class="c cell slot" data-room="6" data-col="TAP"></div>
+        <div class="c cell slot" data-room="6" data-col="TPI"></div>
+        <div class="c cell room rres">RES</div>
+        <div class="c cell slot" data-room="RES" data-col="MAT"></div>
+        <div class="c cell slot" data-room="RES" data-col="SIN"></div>
+        <div class="c cell slot" data-room="RES" data-col="FED"></div>
+        <div class="c cell slot" data-room="RES" data-col="TDO"></div>
+        <div class="c cell slot" data-room="RES" data-col="TFA"></div>
+        <div class="c cell slot" data-room="RES" data-col="TBI"></div>
+        <div class="c cell slot" data-room="RES" data-col="TAP"></div>
+        <div class="c cell slot" data-room="RES" data-col="TPI"></div>
+      </div>
+    </div>
+
+
+<!-- Ore operatori (max 3) -->
+<div class="clean-ops" id="cleanOps">
+  <div class="clean-op-row" data-op="1" style="display:none;">
+    <div class="clean-op-name" id="op1Name" aria-label="Operatore 1"></div>
+    <button class="clean-hour-dot is-zero" id="op1Hours" type="button" data-value="0" aria-label="Ore Operatore 1"></button>
+  </div>
+  <div class="clean-op-row" data-op="2" style="display:none;">
+    <div class="clean-op-name" id="op2Name" aria-label="Operatore 2"></div>
+    <button class="clean-hour-dot is-zero" id="op2Hours" type="button" data-value="0" aria-label="Ore Operatore 2"></button>
+  </div>
+  <div class="clean-op-row" data-op="3" style="display:none;">
+    <div class="clean-op-name" id="op3Name" aria-label="Operatore 3"></div>
+    <button class="clean-hour-dot is-zero" id="op3Hours" type="button" data-value="0" aria-label="Ore Operatore 3"></button>
+  </div>
+</div>
+
+
+
+<div class="clean-actions">
+  <button class="btn primary clean-save-btn" id="cleanSaveLaundry" type="button" aria-label="Salva biancheria">
+    <svg aria-hidden="true" class="ui-ico" viewBox="0 0 24 24">
+      <path d="M6 7h12"></path>
+      <path d="M6 7l1.2 14h9.6L18 7"></path>
+      <path d="M9 7V5a3 3 0 0 1 6 0v2"></path>
+    </svg>
+  </button>
+  <button class="btn warn clean-save-btn" id="cleanSaveHours" type="button" aria-label="Salva ore lavoro">
+    <svg aria-hidden="true" class="ui-ico" viewBox="0 0 24 24">
+      <path d="M12 8v5l3 2"></path>
+      <path d="M12 22a10 10 0 1 0-10-10 10 10 0 0 0 10 10Z"></path>
+    </svg>
+  </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+
+
+<section class="page" hidden id="page-orepulizia">
+  <div class="opcal-wrap">
+    <div class="opcal-filterRow" aria-label="Filtri ore pulizia">
+      <label class="opcal-filter">
+        <select id="opcalMonthSelect" aria-label="Mese"></select>
+      </label>
+      <label class="opcal-filter">
+        <select id="opcalOperatorSelect" aria-label="Operatore"></select>
+      </label>
+    </div>
+
+    <div class="opcal-group" aria-label="Riepilogo ore pulizia">
+      <div class="opcal-group-hd">
+        <div class="opcal-titleMain" id="opcalTitleMain">—</div>
+
+        <div class="opcal-stats" aria-label="Totali ore e benzina">
+          <div class="opcal-stat opcal-stat--blue">
+            <div class="opcal-statLabel">Ore totali</div>
+            <div class="opcal-statValue" id="opcalTotalHours">—</div>
+          </div>
+          <div class="opcal-stat opcal-stat--beige">
+            <div class="opcal-statLabel">Spese Benzina</div>
+            <div class="opcal-statValue" id="opcalDaysWithHours">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opcal-group-bd">
+        <div class="opcal-weekdays" aria-hidden="true">
+          <div class="opcal-weekday">L</div>
+          <div class="opcal-weekday">M</div>
+          <div class="opcal-weekday">M</div>
+          <div class="opcal-weekday">G</div>
+          <div class="opcal-weekday">V</div>
+          <div class="opcal-weekday">S</div>
+          <div class="opcal-weekday">D</div>
+        </div>
+
+        <div class="opcal-grid" id="opcalGrid" aria-label="Calendario ore pulizia"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-lavanderia" hidden>
+  <div class="card">
+    <div class="hd">
+      <h2>Lavanderia</h2>
+      <div class="hd-actions">
+        <button aria-label="Crea foglio lavanderia" class="sq-btn sq-btn-orange" id="btnLaundryCreate" type="button">
+          <div aria-hidden="true" class="sq-ico">
+            <svg aria-hidden="true" class="ui-ico" viewBox="0 0 24 24">
+              <path d="M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"></path>
+              <path d="M8 2v4"></path>
+              <path d="M16 2v4"></path>
+              <path d="M7 7h.01"></path>
+              <path d="M10 7h.01"></path>
+              <path d="M13 7h6"></path>
+              <circle cx="12" cy="14" r="4"></circle>
+            </svg>
+          </div>
+        </button>
+        <button aria-label="Stampa" class="sq-btn sq-btn-blue" id="btnLaundryPrint" type="button">
+          <div aria-hidden="true" class="sq-ico">
+            <svg aria-hidden="true" class="ui-ico" viewBox="0 0 24 24">
+              <path d="M6 9V3h12v6"></path>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <path d="M6 14h12v7H6z"></path>
+            </svg>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <div class="bd">
+      <div class="laundry-sub">
+        <div class="laundry-period" id="laundryPeriodLabel">—</div>
+        <div class="laundry-hint" id="laundryHint">Crea un foglio per il ritiro settimanale. Il conteggio riparte automaticamente.</div>
+      </div>
+
+      
+      <div class="laundry-range" aria-label="Intervallo report lavanderia">
+        <label class="laundry-range-field">
+          <span>Da</span>
+          <input type="date" id="laundryFrom" />
+        </label>
+        <label class="laundry-range-field">
+          <span>A</span>
+          <input type="date" id="laundryTo" />
+        </label>
+      </div>
+<div class="laundry-grid" id="laundryGrid" aria-label="Totali lavanderia">
+<div class="laundry-tile" data-key="MAT">
+  <div class="laundry-tile-top">
+    <div class="laundry-code">MAT</div>
+    <div class="laundry-label" id="laundryLblMAT">Matr.</div>
+  </div>
+  <div class="laundry-value" id="laundryValMAT">0</div>
+</div>
+<div class="laundry-tile" data-key="SIN">
+  <div class="laundry-tile-top">
+    <div class="laundry-code">SIN</div>
+    <div class="laundry-label" id="laundryLblSIN">Sing.</div>
+  </div>
+  <div class="laundry-value" id="laundryValSIN">0</div>
+</div>
+<div class="laundry-tile" data-key="FED">
+  <div class="laundry-tile-top">
+    <div class="laundry-code">FED</div>
+    <div class="laundry-label" id="laundryLblFED">Fed.</div>
+  </div>
+  <div class="laundry-value" id="laundryValFED">0</div>
+</div>
+<div class="laundry-tile" data-key="TDO">
+  <div class="laundry-tile-top">
+    <div class="laundry-code">TDO</div>
+    <div class="laundry-label" id="laundryLblTDO">Doccia</div>
+  </div>
+  <div class="laundry-value" id="laundryValTDO">0</div>
+</div>
+<div class="laundry-tile" data-key="TFA">
+  <div class="laundry-tile-top">
+    <div class="laundry-code">TFA</div>
+    <div class="laundry-label" id="laundryLblTFA">Faccia</div>
+  </div>
+  <div class="laundry-value" id="laundryValTFA">0</div>
+</div>
+<div class="laundry-tile" data-key="TBI">
+  <div class="laundry-tile-top">
+    <div class="laundry-code">TBI</div>
+    <div class="laundry-label" id="laundryLblTBI">Bagno</div>
+  </div>
+  <div class="laundry-value" id="laundryValTBI">0</div>
+</div>
+<div class="laundry-tile" data-key="TAP">
+  <div class="laundry-tile-top">
+    <div class="laundry-code">TAP</div>
+    <div class="laundry-label" id="laundryLblTAP">Tapp.</div>
+  </div>
+  <div class="laundry-value" id="laundryValTAP">0</div>
+</div>
+<div class="laundry-tile" data-key="TPI">
+  <div class="laundry-tile-top">
+    <div class="laundry-code">TPI</div>
+    <div class="laundry-label" id="laundryLblTPI">Picc.</div>
+  </div>
+  <div class="laundry-value" id="laundryValTPI">0</div>
+</div>
+      </div>
+
+      <!-- Print-friendly area -->
+      <div class="laundry-print" id="laundryPrintArea" aria-hidden="true">
+        <h3 class="laundry-print-title">Resoconto Lavanderia</h3>
+        <div class="laundry-print-range" id="laundryPrintRange">—</div>
+        <table class="laundry-table" aria-label="Tabella totali lavanderia">
+          <thead>
+            <tr>
+              <th>Categoria</th>
+              <th>Totale</th>
+            </tr>
+          </thead>
+          <tbody id="laundryPrintBody"></tbody>
+        </table>
+      </div>
+
+      <div class="laundry-history-wrap">
+        <div class="section-title">Storico</div>
+        <div class="list" id="laundryHistory"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Loader globale -->
+<div class="loading-overlay" hidden="" id="loadingOverlay">
+<div class="loading-shell">
+<div aria-label="Caricamento" aria-live="polite" class="loading-card" role="status">
+<div aria-hidden="true" class="loading-hourglass"><svg aria-hidden="true" class="ui-ico" viewbox="0 0 24 24">
+<path d="M7 3h10"></path>
+<path d="M7 21h10"></path>
+<path d="M8 3c0 4 4 5 4 9s-4 5-4 9"></path>
+<path d="M16 3c0 4-4 5-4 9s4 5 4 9"></path>
+</svg></div>
+</div>
+</div>
+</div>
+<script defer="" src="./config.js?v=1.214"></script>
+<script defer="" src="./app.js?v=1.214"></script>
+
+<!-- ROOM CONFIG MODAL -->
+<div id="roomConfigModal" hidden class="modal">
+  <div class="modal-card">
+    <h3 id="roomConfigTitle"></h3>
+    <div class="row"><span>Matrimoniale</span><div class="dots" id="rc_matrimoniale"></div></div>
+    <div class="row"><span>Letti singoli</span><div class="dots" id="rc_singoli"></div></div>
+    <div class="row"><span>Culla</span><div class="dots" id="rc_culla"></div></div>
+    <div class="row"><button id="rc_save" class="btn primary" type="button">Conferma</button></div>
+  </div>
+</div>
+
+<!-- PULIZIE: HEADER INFO MODAL -->
+<div id="cleanHeaderModal" hidden class="modal modal-center" role="dialog" aria-modal="true" aria-label="Descrizione biancheria">
+  <div class="modal-card clean-info-card">
+    <button id="cleanHeaderClose" class="btn ghost clean-info-close" type="button" aria-label="Chiudi">✕</button>
+    <div class="clean-info-text" id="cleanHeaderText">—</div>
+  </div>
+</div>
+
+</body>
+</html>
