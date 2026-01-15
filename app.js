@@ -3,7 +3,7 @@
 /**
  * Build: incrementa questa stringa alla prossima modifica (es. 1.001)
  */
-const BUILD_VERSION = "1.214";
+const BUILD_VERSION = "1.247";
 
 
 
@@ -361,7 +361,7 @@ function truthy(v){
   return (s === "1" || s === "true" || s === "yes" || s === "si" || s === "on");
 }
 
-// dDAE_1.186 — error overlay: evita blocchi silenziosi su iPhone PWA
+// dDAE_1.229 — error overlay: evita blocchi silenziosi su iPhone PWA
 window.addEventListener("error", (e) => {
   try {
     const msg = (e?.message || "Errore JS") + (e?.filename ? ` @ ${e.filename.split("/").pop()}:${e.lineno||0}` : "");
@@ -1271,10 +1271,10 @@ function bindHomeDelegation(){
     }
     const pul = e.target.closest && e.target.closest("#goPulizie");
     if (pul){ hideLauncher(); showPage("pulizie"); return; }
-        const opcal = e.target.closest && e.target.closest("#goOrePulizia");
+        const opcal = e.target.closest && e.target.closest("#goOrePulizia") || e.target.closest("#goOrePuliziaTop");
     if (opcal){ hideLauncher(); showPage("orepulizia"); return; }
 
-const lav = e.target.closest && e.target.closest("#goLavanderia");
+const lav = e.target.closest && e.target.closest("#goLavanderia") || e.target.closest("#goLavanderiaTop");
     if (lav){ hideLauncher(); showPage("lavanderia"); return; }
 
     const imp = e.target.closest && e.target.closest("#goImpostazioni");
@@ -1351,7 +1351,12 @@ function showPage(page){
   }
   if (page === "spese" && !state.speseView) state.speseView = "list";
 
-  state.page = page;
+  const prevPage = state.page;
+  if (page === "calendario" && prevPage && prevPage !== "calendario") {
+    state._calendarPrev = prevPage;
+  }
+
+state.page = page;
   document.body.dataset.page = page;
 
   try { __rememberPage(page); } catch (_) {}
@@ -1375,6 +1380,20 @@ function showPage(page){
     }
   }
 
+
+  // Top back button (Ore pulizia + Calendario)
+  const backBtnTop = $("#backBtnTop");
+  if (backBtnTop){
+    backBtnTop.hidden = !(page === "orepulizia" || page === "calendario");
+  }
+
+
+  // Top tools (solo Pulizie) — lavanderia + ore lavoro accanto al tasto Home
+  const pulizieTopTools = $("#pulizieTopTools");
+  if (pulizieTopTools){
+    pulizieTopTools.hidden = (page !== "pulizie");
+  }
+
   // render on demand
   if (page === "spese") { ensurePeriodData({ showLoader:true }).then(()=>renderSpese()).catch(e=>toast(e.message)); }
   if (page === "riepilogo") { ensurePeriodData({ showLoader:true }).then(()=>renderRiepilogo()).catch(e=>toast(e.message)); }
@@ -1385,7 +1404,7 @@ function showPage(page){
   if (page === "orepulizia") { initOrePuliziaPage().catch(e=>toast(e.message)); }
 
 
-  // dDAE_1.186: fallback visualizzazione Pulizie
+  // dDAE_1.229: fallback visualizzazione Pulizie
   try{
     if (page === "pulizie"){
       const el = document.getElementById("page-pulizie");
@@ -1398,6 +1417,14 @@ function showPage(page){
 function setupHeader(){
   const hb = $("#hamburgerBtn");
   if (hb) hb.addEventListener("click", () => { hideLauncher(); showPage("home"); });
+
+  // Back (ore pulizia + calendario)
+  const bb = $("#backBtnTop");
+  if (bb) bb.addEventListener("click", () => {
+    if (state.page === "orepulizia") { showPage("pulizie"); return; }
+    if (state.page === "calendario") { showPage("ospiti"); return; }
+    showPage("home");
+  });
 }
 function setupHome(){
   bindLauncherDelegation();
@@ -1890,7 +1917,7 @@ function renderSpese(){
           <span class="spesa-sep">·</span>
           <span class="spesa-motivo">${motivo}</span>
         </div>
-        <button class="delbtn" type="button" data-del="${s.id}">Elimina</button>
+        <button class="delbtn delbtn-x" type="button" aria-label="Elimina record" data-del="${s.id}">Elimina</button>
       </div>
     `;
 
@@ -2628,23 +2655,127 @@ function setupOspite(){
   const roomsWrap = document.getElementById("roomsPicker");
   const roomsOut = null; // removed UI string output
 
+  function _getGuestDateRange(){
+    try{
+      const ci = (document.getElementById("guestCheckIn")?.value || "").trim();
+      const co = (document.getElementById("guestCheckOut")?.value || "").trim();
+      if (!ci || !co) return null;
+      // Date ISO YYYY-MM-DD: confronto lessicografico ok
+      if (co <= ci) return null;
+      return { ci, co };
+    }catch(_){ return null; }
+  }
+
+  async function refreshRoomsAvailability(){
+    // Regola: nessuna stanza selezionabile senza intervallo date valido
+    const range = _getGuestDateRange();
+
+    // reset/lock
+    if (!range){
+      state.occupiedRooms = new Set();
+      state._roomsAvailKey = "";
+      // se l'utente non ha ancora inserito date, non deve poter selezionare stanze
+      if (state.guestRooms && state.guestRooms.size){
+        state.guestRooms.clear();
+        if (state.lettiPerStanza) state.lettiPerStanza = {};
+      }
+      renderRooms();
+      return;
+    }
+
+    const key = `${range.ci}|${range.co}`;
+    if (state._roomsAvailKey === key && state.occupiedRooms instanceof Set) {
+      renderRooms();
+      return;
+    }
+    state._roomsAvailKey = key;
+
+    let rows = [];
+    try{
+      const data = await cachedGet("ospiti", {}, { showLoader:false, ttlMs: 15000 });
+      rows = Array.isArray(data) ? data : [];
+    }catch(_){ rows = []; }
+
+    const occ = new Set();
+
+    for (const g of rows){
+      const gi = String(g.check_in ?? g.checkIn ?? g.checkin ?? "").slice(0,10);
+      const go = String(g.check_out ?? g.checkOut ?? g.checkout ?? "").slice(0,10);
+      if (!gi || !go) continue;
+
+      // overlap: [gi,go) interseca [ci,co)
+      if (!(gi < range.co && go > range.ci)) continue;
+
+      const roomsArr = _parseRoomsArr(g.stanze ?? g.rooms ?? g.stanza ?? "");
+      roomsArr.forEach(r => occ.add(r));
+    }
+
+    state.occupiedRooms = occ;
+
+    // Se l'utente aveva selezionato stanze che ora risultano occupate, le togliamo
+    let removed = false;
+    try{
+      for (const r of Array.from(state.guestRooms || [])){
+        if (occ.has(r)){
+          state.guestRooms.delete(r);
+          if (state.lettiPerStanza) delete state.lettiPerStanza[String(r)];
+          removed = true;
+        }
+      }
+    }catch(_){}
+
+    if (removed){
+      try{ toast("Alcune stanze non sono disponibili"); }catch(_){}
+    }
+
+    renderRooms();
+  }
+
   function renderRooms(){
-    const arr = Array.from(state.guestRooms).sort((a,b)=>a-b);
+    const range = _getGuestDateRange();
+    const locked = !range;
+    const occSet = (state.occupiedRooms instanceof Set) ? state.occupiedRooms : new Set();
+
     roomsWrap?.querySelectorAll(".room-dot").forEach(btn => {
+      // Il pallino "M" non è una stanza numerata
+      if (btn.id === "roomMarriage") return;
+
       const n = parseInt(btn.getAttribute("data-room"), 10);
       const on = state.guestRooms.has(n);
+      const occ = !locked && occSet.has(n);
+
       btn.classList.toggle("selected", on);
+      btn.classList.toggle("occupied", occ);
+
+      const dis = locked || occ;
+      btn.disabled = !!dis;
+      btn.setAttribute("aria-disabled", dis ? "true" : "false");
       btn.setAttribute("aria-pressed", on ? "true" : "false");
     });
-  // matrimonio dot
-  setMarriage(state.guestMarriage);
 
+    // matrimonio dot (rimane gestibile come flag)
+    setMarriage(state.guestMarriage);
   }
 
   roomsWrap?.addEventListener("click", (e) => {
     const b = e.target.closest(".room-dot");
     if (!b) return;
+
+    // Matrimonio: flag separato
     if (b.id === "roomMarriage") { setMarriage(!state.guestMarriage); return; }
+
+    const range = _getGuestDateRange();
+    if (!range){
+      try{ toast("Seleziona prima check-in e check-out"); }catch(_){}
+      return;
+    }
+
+    // Se occupata (rossa) => popup
+    if (b.classList.contains("occupied") || b.disabled){
+      try{ toast("Stanza occupata"); }catch(_){}
+      return;
+    }
+
     const n = parseInt(b.getAttribute("data-room"), 10);
     if (state.guestRooms.has(n)) {
       state.guestRooms.delete(n);
@@ -2709,6 +2840,16 @@ function setupOspite(){
     el.addEventListener("change", () => { try { updateGuestRemaining(); } catch (_) {} });
   });
   try { updateGuestRemaining(); } catch (_) {}
+
+
+  // ✅ Stanze: blocca selezione finché non c'è un intervallo date valido + segna stanze occupate (rosso)
+  ["guestCheckIn","guestCheckOut"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", () => { try { refreshRoomsAvailability(); } catch (_) {} });
+    el.addEventListener("change", () => { try { refreshRoomsAvailability(); } catch (_) {} });
+  });
+  try { refreshRoomsAvailability(); } catch (_) {}
 
 
   const btnCreate = document.getElementById("createGuestCard");
@@ -2978,8 +3119,8 @@ async function init(){
   const cleanGrid = document.getElementById("cleanGrid");
   const cleanSaveLaundry = document.getElementById("cleanSaveLaundry");
   const cleanSaveHours = document.getElementById("cleanSaveHours");
-  const btnLaundryFromPulizie = document.getElementById("btnLaundryFromPulizie");
-  const btnOrePuliziaFromPulizie = document.getElementById("btnOrePuliziaFromPulizie");
+  const btnLaundryFromPulizie = document.getElementById("topLaundryBtn");
+  const btnOrePuliziaFromPulizie = document.getElementById("topWorkBtn");
 
   // --- Pulizie: popup descrizioni intestazioni (MAT/SIN/...) ---
   const cleanHeaderModal = document.getElementById("cleanHeaderModal");
@@ -3469,11 +3610,10 @@ if (cleanSaveHours){
 
 
 // --- Lavanderia ---
-  const btnLaundryCreate = document.getElementById("btnLaundryCreate");
-  const btnLaundryPrint = document.getElementById("btnLaundryPrint");
+  const btnLaundryGenerate = document.getElementById("btnLaundryGenerate");
 
-  if (btnLaundryCreate){
-    bindFastTap(btnLaundryCreate, async () => {
+if (btnLaundryGenerate){
+    bindFastTap(btnLaundryGenerate, async () => {
       try{
         showPage("lavanderia");
         await createLavanderiaReport_();
@@ -3483,12 +3623,7 @@ if (cleanSaveHours){
       }
     });
   }
-  if (btnLaundryPrint){
-    bindFastTap(btnLaundryPrint, () => {
-      try{ window.print(); }catch(_){}
-    });
-  }
-  if (typeof btnOrePuliziaFromPulizie !== "undefined" && btnOrePuliziaFromPulizie){
+if (typeof btnOrePuliziaFromPulizie !== "undefined" && btnOrePuliziaFromPulizie){
     bindFastTap(btnOrePuliziaFromPulizie, () => {
       try{ showPage("orepulizia"); }catch(_){}
     });
@@ -3508,16 +3643,38 @@ if (cleanSaveHours){
 }
 
 
-// ===== CALENDARIO (dDAE_1.186) =====
+// ===== CALENDARIO (dDAE_1.229) =====
 function setupCalendario(){
   const pickBtn = document.getElementById("calPickBtn");
   const todayBtn = document.getElementById("calTodayBtn");
   const prevBtn = document.getElementById("calPrevBtn");
   const nextBtn = document.getElementById("calNextBtn");
+  const syncBtn = document.getElementById("calSyncBtn");
   const input = document.getElementById("calDateInput");
 
   if (!state.calendar) {
     state.calendar = { anchor: new Date(), ready: false, guests: [] };
+  }
+
+  // Sync: forza lettura database (tap-safe iOS PWA)
+  if (syncBtn){
+    syncBtn.setAttribute("aria-label", "Forza lettura database");
+    bindFastTap(syncBtn, async () => {
+      try{
+        syncBtn.disabled = true;
+        syncBtn.classList.add("is-loading");
+        if (state.calendar) state.calendar.ready = false;
+        await ensureCalendarData({ force:true });
+        renderCalendario();
+        try{ toast("Aggiornato"); }catch(_){ }
+      }catch(e){
+        console.error(e);
+        try{ toast(e.message || "Errore"); }catch(_){ }
+      }finally{
+        syncBtn.classList.remove("is-loading");
+        syncBtn.disabled = false;
+      }
+    });
   }
 
   const openPicker = () => {
@@ -3547,7 +3704,7 @@ function setupCalendario(){
 }
 
 
-async function ensureCalendarData() {
+async function ensureCalendarData({ force = false } = {}) {
   if (!state.calendar) state.calendar = { anchor: new Date(), ready: false, guests: [], rangeKey: "" };
 
   const anchor = (state.calendar && state.calendar.anchor) ? state.calendar.anchor : new Date();
@@ -3559,10 +3716,10 @@ async function ensureCalendarData() {
   const rangeKey = `${winFrom}|${winTo}`;
 
   // Se ho già i dati per questa finestra, non ricarico
-  if (state.calendar.ready && state.calendar.rangeKey === rangeKey) return;
+  if (!force && state.calendar.ready && state.calendar.rangeKey === rangeKey) return;
 
   await load({ showLoader: true }); // necessario per i pallini letti
-  const data = await cachedGet("ospiti", { from: winFrom, to: winTo }, { showLoader: true, ttlMs: 30*1000 });
+    const data = await cachedGet("ospiti", { from: winFrom, to: winTo }, { showLoader: true, ttlMs: 30*1000, force });
   state.calendar.guests = Array.isArray(data) ? data : [];
   state.calendar.ready = true;
   state.calendar.rangeKey = rangeKey;
@@ -3592,15 +3749,15 @@ function renderCalendario(){
 
   // Angolo alto-sinistra: etichetta "ST" (sopra la colonna stanze, a sinistra dei giorni)
   const corner = document.createElement("div");
-  corner.className = "cal-pill corner";
-  corner.textContent = "ST";
+  corner.className = "cal-cell cal-head cal-corner";
+  corner.innerHTML = `<div class="cal-corner-text">ST</div>`;
   frag.appendChild(corner);
 
-  // Prima riga: giorni (colonne)
+// Prima riga: giorni (colonne)
   for (let i = 0; i < 7; i++) {
     const d = days[i];
     const dayPill = document.createElement("div");
-    dayPill.className = "cal-pill day";
+    dayPill.className = "cal-cell cal-head";
 
     // Abbreviazione (LUN, MAR...) sopra, numero giorno sotto
     const ab = document.createElement("div");
@@ -3842,7 +3999,7 @@ function toRoman(n){
 
 
 /* =========================
-   Lavanderia (dDAE_1.186)
+   Lavanderia (dDAE_1.229)
 ========================= */
 const LAUNDRY_COLS = ["MAT","SIN","FED","TDO","TFA","TBI","TAP","TPI"];
 const LAUNDRY_LABELS = {
@@ -4034,9 +4191,9 @@ async function loadLavanderia() {
     state.laundry.list = list;
     renderLaundryHistory_(list);
     renderLaundry_(list[0] || null);
-    if (hint) hint.textContent = "Seleziona un intervallo (Da/A) e crea il report da consegnare alla lavanderia.";
+    if (hint) hint.textContent = "";
   } catch (e) {
-    if (hint) hint.textContent = "Offline o errore: non riesco a caricare lo storico.";
+    if (hint) hint.textContent = "";
     throw e;
   }
 }
@@ -4050,24 +4207,24 @@ async function createLavanderiaReport_() {
   const endDate = (toEl && toEl.value) ? String(toEl.value).trim() : "";
 
   if (!startDate || !endDate) {
-    if (hint) hint.textContent = "Seleziona prima l'intervallo (Da e A).";
+    if (hint) hint.textContent = "";
     toast("Seleziona Da e A");
     return null;
   }
   if (startDate > endDate) {
-    if (hint) hint.textContent = "Intervallo non valido: 'Da' non può essere dopo 'A'.";
+    if (hint) hint.textContent = "";
     toast("Intervallo non valido");
     return null;
   }
 
-  if (hint) hint.textContent = "Sto creando il report…";
+  if (hint) hint.textContent = "";
   const res = await api("lavanderia", { method:"POST", body: { startDate, endDate }, showLoader:true });
   const item = sanitizeLaundryItem_(res && res.data ? res.data : res);
 
   await loadLavanderia();
   renderLaundry_(item);
 
-  if (hint) hint.textContent = "Report creato e salvato.";
+  if (hint) hint.textContent = "";
   return item;
 }
 
@@ -4205,7 +4362,7 @@ document.getElementById('rc_save')?.addEventListener('click', ()=>{
 // --- end room beds config ---
 
 
-// --- FIX dDAE_1.186: renderSpese allineato al backend ---
+// --- FIX dDAE_1.229: renderSpese allineato al backend ---
 // --- dDAE: Spese riga singola (senza IVA in visualizzazione) ---
 function renderSpese(){
   const list = document.getElementById("speseList");
@@ -4280,7 +4437,7 @@ function renderSpese(){
           <span class="spesa-sep">·</span>
           <span class="spesa-motivo">${motivo}</span>
         </div>
-        <button class="delbtn" type="button" data-del="${s.id}">Elimina</button>
+        <button class="delbtn delbtn-x" type="button" aria-label="Elimina record" data-del="${s.id}">Elimina</button>
       </div>
     `;
 
@@ -4301,7 +4458,7 @@ function renderSpese(){
 
 
 
-// --- FIX dDAE_1.186: delete reale ospiti ---
+// --- FIX dDAE_1.229: delete reale ospiti ---
 function attachDeleteOspite(card, ospite){
   const btn = document.createElement("button");
   btn.className = "delbtn";
@@ -4335,7 +4492,7 @@ function attachDeleteOspite(card, ospite){
 })();
 
 
-// --- FIX dDAE_1.186: mostra nome ospite ---
+// --- FIX dDAE_1.229: mostra nome ospite ---
 (function(){
   const orig = window.renderOspiti;
   if (!orig) return;
@@ -4413,6 +4570,9 @@ function __overlapNights(checkInISO, checkOutISO, fromISO, toISO_inclusive){
 function resetTassaUI(){
   const res = $("#taxResults");
   if (res) res.hidden = true;
+  const rb = $("#taxReportBtn");
+  if (rb) rb.disabled = true;
+
   const ids = ["taxPayingCount","taxPayingAmount","taxKidsCount","taxKidsAmount","taxReducedCount","taxReducedAmount"];
   ids.forEach(id => { const el = $("#"+id); if (el) el.textContent = "—"; });
 }
@@ -4468,9 +4628,14 @@ async function calcTassa(){
   const payingAmt  = payingPres * rate;
   const reducedAmt = reducedPres * rate * redFactor;
 
+  // salva per report
+  state._taxLast = { from, to, payingPres, kidsPres, reducedPres, rate, redFactor, payingAmt, reducedAmt, totalAmt: (payingAmt + reducedAmt) };
+
   // UI: mostra solo dopo click Calcola
   const res = $("#taxResults");
   if (res) res.hidden = false;
+  const rb = $("#taxReportBtn");
+  if (rb) rb.disabled = false;
 
   const pc = $("#taxPayingCount"); if (pc) pc.textContent = String(payingPres);
   const pa = $("#taxPayingAmount"); if (pa) pa.textContent = formatEUR(payingAmt);
@@ -4482,14 +4647,83 @@ async function calcTassa(){
   const ra = $("#taxReducedAmount"); if (ra) ra.textContent = formatEUR(reducedAmt);
 }
 
+
+function buildTaxReportText(){
+  const t = state._taxLast;
+  if (!t) return "Premi prima Calcola.";
+  const lines = [];
+  lines.push("Report tassa di soggiorno");
+  lines.push(`Periodo: ${t.from} → ${t.to}`);
+  lines.push("");
+  lines.push(`Presenze paganti: ${t.payingPres}`);
+  lines.push(`Importo paganti: ${formatEUR(t.payingAmt)}`);
+  lines.push("");
+  lines.push(`Presenze ridotte: ${t.reducedPres}`);
+  lines.push(`Importo ridotti: ${formatEUR(t.reducedAmt)}`);
+  lines.push("");
+  lines.push(`Bambini (<10): ${t.kidsPres} (esenti)`);
+  lines.push("");
+  lines.push(`Tariffa: ${formatEUR(t.rate)} / persona / notte`);
+  if (t.redFactor !== 1) lines.push(`Fattore ridotti: ${String(t.redFactor)}`);
+  lines.push("");
+  lines.push(`TOTALE: ${formatEUR(t.totalAmt)}`);
+  return lines.join("\n");
+}
+
+function openTaxReportModal(text){
+  const modal = document.getElementById("taxReportModal");
+  const pre = document.getElementById("taxReportText");
+  const closeBtn = document.getElementById("taxReportCloseBtn");
+  const copyBtn = document.getElementById("taxReportCopyBtn");
+
+  if (!modal || !pre) return;
+  pre.textContent = text || "";
+
+  modal.hidden = false;
+  modal.setAttribute("aria-hidden","false");
+
+  const close = () => {
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden","true");
+  };
+
+  // click su overlay chiude
+  const onOverlay = (e)=>{
+    if (e.target === modal) close();
+  };
+  modal.addEventListener("click", onOverlay, { once:true });
+
+  if (closeBtn){
+    closeBtn.onclick = close;
+  }
+
+  if (copyBtn){
+    copyBtn.onclick = async () => {
+      try{
+        const txt = pre.textContent || "";
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          await navigator.clipboard.writeText(txt);
+        } else {
+          // fallback
+          const ta = document.createElement("textarea");
+          ta.value = txt;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          ta.remove();
+        }
+        toast("Copiato");
+      }catch(_){
+        toast("Impossibile copiare");
+      }
+    };
+  }
+}
+
+
 function initTassaPage(){
   if (__tassaBound) return;
   __tassaBound = true;
-
-  const back = $("#taxBackBtn");
-  if (back){
-    bindFastTap(back, () => { showPage("home"); showLauncher(); });
-  }
 
   const from = $("#taxFrom");
   const to = $("#taxTo");
@@ -4504,14 +4738,15 @@ function initTassaPage(){
     });
   }
 
-  // Stato iniziale: risultati nascosti finché non premi "Calcola"
+
+// Stato iniziale: risultati nascosti finché non premi "Calcola"
   resetTassaUI();
 }
 
 
 /* =========================
    Ore pulizia (Calendario ore operatori)
-   Build: dDAE_1.214
+   Build: dDAE_1.229
 ========================= */
 
 state.orepulizia = state.orepulizia || {
@@ -4725,7 +4960,14 @@ async function initOrePuliziaPage(){
   if (!s.inited){
     s.inited = true;
 
-    if (back) back.addEventListener("click", ()=>showPage("home"));
+    if (back) back.addEventListener("click", ()=>showPage("pulizie"));
+
+    // Topbar: tasto arancione "torna a Pulizie"
+    const topBack = document.getElementById("backBtnTop");
+    if (topBack && !s._topBackBound){
+      s._topBackBound = true;
+      bindFastTap(topBack, () => { try{ showPage("pulizie"); }catch(_){ } });
+    }
 
     if (selMonth) selMonth.addEventListener("change", ()=>{
       s.monthKey = selMonth.value;
